@@ -40,6 +40,14 @@ Route::group(['middleware' => 'api'], function () {
         Route::put('update/{id}', 'App\Http\Controllers\API\kelasController@update');
         Route::delete('delete/{id}', 'App\Http\Controllers\API\kelasController@delete');
     });
+
+    Route::group(['prefix' => 'matkul'], function (){
+        Route::post('create','App\Http\Controllers\API\MatkulController@create');
+        Route::get('detail/{id}','App\Http\Controllers\API\MatkulController@detail');
+        Route::get('index','App\Http\Controllers\API\MatkulController@index');
+        Route::put('update/{id}','App\Http\Controllers\API\MatkulController@update');
+        Route::delete('delete/{id}','App\Http\Controllers\API\MatkulController@delete');
+    });
 });
 // Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 //     return $request->user();

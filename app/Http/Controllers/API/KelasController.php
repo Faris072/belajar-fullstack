@@ -33,6 +33,16 @@ class KelasController extends Controller
                 ],400);
             }
 
+            if(Auth()->user()->role_id != 1){
+                return response()->json([
+                    'data' => [],
+                    'status' => [
+                        'message' => 'Access denied',
+                        'code' => 403
+                    ]
+                ],403);
+            }
+
             $kelas = Kelas::create([
                 'name' => $request->name,
                 'angkatan' => $request->angkatan,
@@ -70,7 +80,13 @@ class KelasController extends Controller
     public function detail($id){
         try{
 
-            $query = Kelas::with('matkul')->find($id);//with harus selalu paling depan
+            $query = Kelas::with([
+                'matkul',
+                'matkul.presensi',
+                'matkul.presensi.absen',
+                'matkul.day',
+                'matkul.dosen',
+            ])->find($id);//with harus selalu paling depan
 
             if(!$query){
                 return response()->json([
@@ -105,7 +121,13 @@ class KelasController extends Controller
     public function index(){
         try{
 
-            $query = Kelas::with('matkul','matkul.presensi','matkul.presensi.absen')->get();//with harus selalu paling depan
+            $query = Kelas::with([
+                'matkul',
+                'matkul.presensi',
+                'matkul.presensi.absen',
+                'matkul.day',
+                'matkul.dosen',
+            ])->get();//with harus selalu paling depan
 
             if(!$query){
                 return response()->json([
