@@ -37,4 +37,16 @@ class User extends Authenticatable implements JWTSubject
     {
         return [];
     }
+
+    public function matkul(){
+        return $this->hasMany(Matkul::class, 'user_id', 'id');
+    }
+
+    public function role(){
+        return $this->belongsTo(Role::class,'role_id','id');//role_id adalah fk dari model ini, id adalah PK dari model role
+    }
+
+    public function absen(){
+        return $this->hasMany(Absen::class,'user_id');
+    }
 }

@@ -13,7 +13,7 @@ class AuthController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api', ['except' => ['login','register']]);
+        $this->middleware('auth:api', ['except' => ['login']]);
     }
 
     public function register(Request $request){
@@ -23,11 +23,13 @@ class AuthController extends Controller
                 'username.min:3' => 'Username minimal 3 karakter!',
                 'password.min:8' => 'Password minimal 8 karakter!',
                 'password.required' => 'Password wajib di isi!',
+                'role_id' => 'Role wajib di isi!'
             ];
 
             $validatedData = Validator::make($request->all(),[
                 'username' => 'required|min:3',
-                'password' => 'required|min:8'
+                'password' => 'required|min:8',
+                'role_id' => 'required'
             ],$errorMessage);
 
             if($validatedData->fails()){
@@ -39,11 +41,33 @@ class AuthController extends Controller
                     ]
                 ]);
             }
-
-            $register = User::create([
-                'username' => $request->username,
-                'password' => bcrypt($request->password)
-            ]);
+            if(Auth()->user()->role_id == 1){
+                if($request->role_id != 1){
+                    $register = User::create([
+                        'role_id' => $request->role_id,
+                        'username' => $request->username,
+                        'password' => bcrypt($request->password)
+                    ]);
+                }
+                else{
+                    return response()->json([
+                        'data' => [],
+                        'status' => [
+                            'message' => 'Tambah user admin ditolak!',
+                            'code' => 400
+                        ]
+                    ]);
+                }
+            }
+            else{
+                return response()->json([
+                    'data' => [],
+                    'status' => [
+                        'message' => 'Anda bukan admin',
+                        'code' => 400
+                    ]
+                ]);
+            }
 
             if($register){
                 return response()->json([
@@ -122,12 +146,37 @@ class AuthController extends Controller
         return $this->respondWithToken(auth()->refresh());
     }
 
+    public function data(){
+        try{
+            $user = User::with('presensi','role')->get();
+            if($user || count($user) > 0){
+                // @dd($user->absen());
+                return response()->json([
+                    'data' => $user,
+                    'status' => [
+                        'message' => 'Get data user successfully',
+                        'code' => 200
+                    ]
+                ],200);
+            }
+        }
+        catch(\Exception $e){
+            return response()->json([
+                'data' => [],
+                'status' => [
+                    'message' => $e->getMessage(),
+                    'code' => 500
+                ]
+            ],500);
+        }
+    }
+
     protected function respondWithToken($token)
     {
         return response()->json([
             'access_token' => $token,
             'token_type' => 'bearer',
-            'expires_in' => auth()->factory()->getTTL() * 60
+            'expires_in' => auth()->factory()->getTTL() * 600
         ]);
     }
 }
