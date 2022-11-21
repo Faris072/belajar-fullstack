@@ -14,9 +14,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::resource('test', 'App\Http\Controllers\API\TestController');
+Route::get('test', 'App\Http\Controllers\API\TestController@index');
 Route::post('login', 'App\Http\Controllers\API\AuthController@login');
-Route::group(['middleware' => 'api'], function () {
+Route::group(['middleware' => 'auth:api', 'except' => 'test'], function () {//middleware auth:api sesuai yang telah diberikan di construct authCOntroller di webnya jwt jadi tidak usah menggunakan construct
     Route::post('register', 'App\Http\Controllers\API\AuthController@register');
     Route::post('logout', 'App\Http\Controllers\API\AuthController@logout');
     Route::post('refresh', 'App\Http\Controllers\API\AuthController@refresh');

@@ -10,7 +10,8 @@ use Illuminate\Routing\Controller as BaseController;
 class Controller extends BaseController
 {
     use AuthorizesRequests, DispatchesJobs, ValidatesRequests;
-    public function __construct(){
-        date_default_timezone_set('Asia/Jakarta');
-    }
+    // public function __construct()
+    // {
+    //     $this->middleware('auth:api', ['except' => ['test','login']]);//harus urut
+    // }
 }

@@ -4,14 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use App\Models\User;
-use App\Models\Presensi;
 
 class Absen extends Model
 {
     use HasFactory;
 
-    protected $table = ['absen'];
+    protected $table = 'absen';
     protected $guarded = ['id'];
 
     public function mahasiswa(){

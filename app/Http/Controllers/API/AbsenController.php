@@ -23,9 +23,9 @@ class AbsenController extends Controller
                 ],403);
             }
 
-            $start_absen = date('H:i:s', strtotime('now'));
+            $start_absen = now();
 
-            $request->query->add([
+            $request->add([
                 'user_id' => Auth()->user()->id,
                 'presensi_id' => $id
             ]);
@@ -33,25 +33,23 @@ class AbsenController extends Controller
             $message = [
                 'user_id.required' => 'User id wajib di isi',
                 'presensi_id.required' => 'Presensi id wajib di isi',
-                'is_wfo.required' => 'Is WFO wajib di isi berupa boolean (0 / 1)',
             ];
 
             $validatedData = Validator::make($request->all(),[
                 'user_id' => 'required',
                 'presensi_id' => 'required',
-                'is_wfo' => 'required',
             ],$message);
 
             if($validatedData->fails()){
                 return response()->json([
                     'data' => [],
                     'status' => [
-                        'message' => $validatedData->messages(),
+                        'message' => $validatedData->getMessageBag(),
                         'code' => 401
                     ]
                 ],401);
             }
-
+            @dd($validatedData);
             //pake DB:: soale absen e rusak
 
             $cek_absen = DB::table('absen')->where('user_id',Auth()->user()->id)->where('presensi_id',$id)->first();

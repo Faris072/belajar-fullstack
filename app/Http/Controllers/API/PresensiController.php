@@ -7,17 +7,57 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Presensi;
+use App\Models\Matkul;
+use Carbon\Carbon;
 
 class PresensiController extends Controller
 {
     public function open(Request $request){
-        $date = date('d-m-Y', strtotime('now'));
+        $attributes = [
+            'matkul_id' => 'Id matkul',
+            'presensi_date' => 'Tanggal presensi',
+            'start_presensi' => 'Waktu mulai presensi',
+            'end_presensi' => 'Waktu selesai presensi',
+            'description' => 'Deskripsi',
+            'status' => 'Status'
+        ];
+        $messages = [
+            'required' => ':attribute tidak boleh kosong',
+            'numeric' => ':attribute harus berupa angka',
+            'status.numeric' => 'Status berupa boolean bertipe numeric (1/0)'
+        ];
+        $validatedData = Validator::make($request->all(),[
+            'matkul_id' => 'required|numeric',
+            'description' => '',
+        ],$messages,$attributes);
+
+        if($validatedData->fails()){
+            return response()->json([
+                'data' => [],
+                'status' => [
+                    'message' => $validatedData->getMessageBag(),
+                    'code' => 400
+                ]
+            ],400);
+        }
+
+        if($request->status == 1 || $request->status == 0){}
+        else{
+            return response()->json([
+                'data' => [],
+                'status' => [
+                    'message' => 'Status berupa boolean bertipe numeric (1/0)',
+                    'code' => 400
+                ]
+            ],400);
+        }
+
+        $date = now();
         $start = date('H:i:s', strtotime('now'));
         $end = date('H:i:s', strtotime('+1 hours'));
 
         $data = [
-            'user_id' => Auth()->user()->id,
-            'role_id' => Auth()->user()->role_id,
+            'matkul_id' => $request->matkul_id,
             'presensi_date' => $date,
             'start_presensi' => $start,
             'end_presensi' => $end,
@@ -25,11 +65,25 @@ class PresensiController extends Controller
             'status' => 1
         ];
 
+        $cek_matkul = Matkul::find($request->matkul_id);
+
+        if(!$cek_matkul){
+            return response()->json([
+                'data' => [],
+                'status' => [
+                    'message' => 'Matkul tidak ditemukan',
+                    'code' => 400
+                ]
+            ],400);
+        }
+
         if(Auth()->user()->role_id == 1 || Auth()->user()->role_id == 2){
-            $cek_presensi = DB::select('SELECT * FROM presensi WHERE id = (SELECT MAX(id) FROM presensi WHERE user_id::int='.Auth()->user()->id.')');
+            // @dd($date);
+            $cek_presensi = DB::select('SELECT * FROM presensi WHERE id = (SELECT MAX(id) FROM presensi WHERE matkul_id = '.$request->matkul_id.')');
             if(count($cek_presensi) > 0){
                 if($cek_presensi[0]->status == 0){
                     $create = Presensi::create($data);
+                    $create->presensi_date = Carbon::make($create->presensi_date)->translatedFormat('l, j F Y H:i:s');//carbon untuk management date
                     if($create){
                         return response()->json([
                             'data' => $create,//hanya bisa untuk create
@@ -93,11 +147,11 @@ class PresensiController extends Controller
     }
 
     public function close(Request $request){
-        $user_id = Auth()->user()->id;
-        $presensi = DB::select('SELECT * FROM presensi WHERE id = (SELECT MAX(id) FROM presensi WHERE user_id::int='.$user_id.')');
+        $matkul_id = $request->matkul_id;
+        $presensi = DB::select('SELECT * FROM presensi WHERE id = (SELECT MAX(id) FROM presensi WHERE matkul_id ='.$matkul_id.')');
         if($presensi[0]->status == 1){
             $close = Presensi::find($presensi[0]->id)->update([
-                'end_presensi' => date('H:i:s', strtotime('now')),
+                'end_presensi' => now(),
                 'status' => 0
             ]);
         }

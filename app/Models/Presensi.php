@@ -5,7 +5,6 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
-use App\Models\Absen;
 
 class Presensi extends Model
 {
@@ -18,6 +17,6 @@ class Presensi extends Model
     }
 
     public function absen(){
-        return $this->hasMany(Absen::class, 'user_id', 'id');
+        return $this->hasMany(Absen::class, 'presensi_id', 'id');
     }
 }

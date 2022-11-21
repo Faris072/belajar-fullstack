@@ -16,7 +16,7 @@ class CreatePresensisTable extends Migration
         Schema::create('presensi', function (Blueprint $table) {
             $table->id();
             $table->foreignId('matkul_id');
-            $table->dateTime('presensi_date');
+            $table->date('presensi_date');
             $table->time('start_presensi');
             $table->time('end_presensi');
             $table->string('description')->nullable();
