@@ -26,6 +26,8 @@ Route::group(['middleware' => 'auth:api', 'except' => 'test'], function () {//mi
     Route::group(['prefix' => 'presensi'], function(){
         Route::post('open', 'App\Http\Controllers\API\PresensiController@open');
         Route::post('close', 'App\Http\Controllers\API\PresensiController@close');
+        Route::get('detail/{id}', 'App\Http\Controllers\API\PresensiController@detail');
+        Route::put('update/{id}', 'App\Http\Controllers\API\PresensiController@update');
         Route::delete('delete/{id}', 'App\Http\Controllers\API\PresensiController@delete');
     });
 

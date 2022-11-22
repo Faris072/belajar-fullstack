@@ -113,6 +113,7 @@ class MatkulController extends Controller
                 'dosen',
                 'presensi',
                 'presensi.absen',
+                'presensi.absen.keterangan',
                 'day'
             ])->find($id);
 
@@ -152,6 +153,7 @@ class MatkulController extends Controller
                 'dosen',
                 'presensi',
                 'presensi.absen',
+                'presensi.absen.keterangan',
                 'day'
             ])->get();
 

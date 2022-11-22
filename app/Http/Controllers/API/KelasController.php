@@ -86,6 +86,7 @@ class KelasController extends Controller
                 'matkul',
                 'matkul.presensi',
                 'matkul.presensi.absen',
+                'matkul.presensi.absen.keterangan',
                 'matkul.day',
                 'matkul.dosen',
             ])->find($id);//with harus selalu paling depan
@@ -127,6 +128,7 @@ class KelasController extends Controller
                 'matkul',
                 'matkul.presensi',
                 'matkul.presensi.absen',
+                'matkul.presensi.absen.keterangan',
                 'matkul.day',
                 'matkul.dosen',
             ])->get();//with harus selalu paling depan

@@ -21,6 +21,6 @@ class Absen extends Model
     }
 
     public function keterangan(){
-        return $this->belongsTo(Keterangan::class, 'absen_id', 'id');
+        return $this->belongsTo(Keterangan::class, 'keterangan_id', 'id');
     }
 }

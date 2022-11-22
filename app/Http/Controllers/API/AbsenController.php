@@ -25,19 +25,21 @@ class AbsenController extends Controller
 
             $start_absen = now();
 
-            $request->add([
+            $request->query->add([
                 'user_id' => Auth()->user()->id,
                 'presensi_id' => $id
             ]);
 
             $message = [
                 'user_id.required' => 'User id wajib di isi',
-                'presensi_id.required' => 'Presensi id wajib di isi',
+                'presensi_id.required' => 'Presensi wajib dipilih',
+                'keterangan_id.required' => 'Keterangan wajib di isi',
             ];
 
             $validatedData = Validator::make($request->all(),[
                 'user_id' => 'required',
                 'presensi_id' => 'required',
+                'keterangan_id' => 'required',
             ],$message);
 
             if($validatedData->fails()){
@@ -49,10 +51,9 @@ class AbsenController extends Controller
                     ]
                 ],401);
             }
-            @dd($validatedData);
             //pake DB:: soale absen e rusak
 
-            $cek_absen = DB::table('absen')->where('user_id',Auth()->user()->id)->where('presensi_id',$id)->first();
+            $cek_absen = Absen::where('user_id',Auth()->user()->id)->where('presensi_id',$id)->first();
             if($cek_absen){
                 return response()->json([
                     'data' => [],
@@ -66,18 +67,10 @@ class AbsenController extends Controller
             $absen = Absen::create([
                 'user_id' => $request->user_id,
                 'presensi_id' => $request->presensi_id,
+                'keterangan_id' => $request->keterangan_id,
                 'start_absen' => $start_absen,
-                'is_wfo' => $request->is_wfo,
                 'description' => $request->description
             ]);
-
-            // $absen = DB::table('absen')->insert([
-            //     'user_id' => $request->user_id,
-            //     'presensi_id' => $request->presensi_id,
-            //     'start_absen' => $start_absen,
-            //     'is_wfo' => $request->is_wfo,
-            //     'description' => $request->description
-            // ]);
 
             if($absen){
                 return response()->json([

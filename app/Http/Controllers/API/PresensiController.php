@@ -176,6 +176,113 @@ class PresensiController extends Controller
         }
     }
 
+    public function update(Request $request,$id){
+        try{
+            $attributes = [
+                'matkul_id' => 'Matkul',
+                'presensi_date' => 'Tanggal Presensi',
+                'start_presensi' => 'Waktu mulai presensi',
+                'end_presensi' => 'Waktu selesai presensi',
+                'description' => 'Deskripsi',
+                'status' => 'Status'
+            ];
+            $messages = [
+                'required' => ':attribute tidak boleh kosong',
+                'numeric' => ':attribute harus berupa angka',
+                'status.numeric' => ':attribute harus berupa boolean 1/0'
+            ];
+            $validatedData = Validator::make($request->all(),[
+                'matkul_id' => 'required|numeric',
+                'presensi_date' => 'required',
+                'start_presensi' => 'required',
+                'end_presensi' => 'required',
+                'description' => '',
+                'status' => 'reqired|numeric'
+            ],$messages,$attributes);
+
+            if(!$validatedData){
+                return response()->json([
+                    'data' => [],
+                    'status' => [
+                        'message' => $validatedData->getMessageBag(),
+                        'code' => 400
+                    ]
+                ],400);
+            }
+
+            if($request->status == 1 || $request->status == 0){
+                $update = Presensi::find($id)->update([
+                    'matkul_id' => $request->matkul_id,
+                    'presensi_date' => Carbon::make($request->presensi_date)->toDateTimeString(),
+                    'start_presensi' => $request->start_presensi,
+                    'end_presensi' => $request->end_presensi,
+                    'description' => $request->description,
+                    'status' => 0,
+                ]);
+            }
+            else{
+                return response()->json([
+                    'data' => [],
+                    'status' => [
+                        'message' => 'Status berupa boolean bertipe numeric (1/0)',
+                        'code' => 200
+                    ]
+                ]);
+            }
+
+            if($update){
+                $get_update = Presensi::with([
+                    'absen',
+                    'absen.keterangan'
+                ])->find($id);
+                return response()->json([
+                    'data' => $get_update,
+                    'status' => [
+                        'message' => 'Succesfuly updated',
+                        'code' => 200
+                    ]
+                ],200);
+            }
+        }
+        catch(\Exception $e){
+            return response()->json([
+                'data' => [],
+                'status' => [
+                    'message' => $e->getMessage(),
+                    'code' => 500
+                ]
+            ],500);
+        }
+    }
+
+    public function detail($id){
+        $query = Presensi::with([
+            'absen',
+            'absen.keterangan',
+            'matkul',
+            'matkul.kelas',
+            'matkul.dosen',
+            'matkul.day',
+        ])->find($id);
+        if(!$query){
+            return response()->json([
+                'data' => [],
+                'status' => [
+                    'message' => 'No data found',
+                    'code' => 404
+                ]
+            ],404);
+        }
+
+        return response()->json([
+            'data' => $query,
+            'status' => [
+                'message' => 'Successfully found',
+                'code' => 200
+            ]
+        ],200);
+    }
+
     public function delete($id){
         try{
             $deleted_presensi = Presensi::find($id);
