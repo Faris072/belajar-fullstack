@@ -13,7 +13,7 @@ class Absen extends Model
     protected $guarded = ['id'];
 
     public function mahasiswa(){
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class,'user_id','id');
     }
 
     public function presensi(){

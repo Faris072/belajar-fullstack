@@ -33,6 +33,7 @@ Route::group(['middleware' => 'auth:api', 'except' => 'test'], function () {//mi
 
     Route::group(['prefix' => 'absen'], function (){
         Route::post('create/{id}', 'App\Http\Controllers\API\AbsenController@create');
+        Route::get('detail/{id}', 'App\Http\Controllers\API\AbsenController@detail');
     });
 
     Route::group(['prefix' => 'kelas'], function (){

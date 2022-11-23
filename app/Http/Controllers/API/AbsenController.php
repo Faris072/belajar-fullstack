@@ -101,4 +101,40 @@ class AbsenController extends Controller
             ],500);
         }
     }
+
+    public function detail($id){
+        try{
+            $query = Absen::with([
+                'presensi',
+                'mahasiswa',
+                'keterangan'
+            ])->find($id);
+            if(!$query){
+                return response()->json([
+                    'data' => [],
+                    'status' => [
+                        'message' => 'No data',
+                        'code' => 404
+                    ]
+                ],404);
+            }
+
+            return response()->json([
+                'data' => $query,
+                'status' => [
+                    'message' => 'Data successfully retrieved',
+                    'code' => 200
+                ]
+            ],200);
+        }
+        catch(\Exception $e){
+            return response()->json([
+                'data' => [],
+                'status' => [
+                    'message' =>$e->getMessage(),
+                    'code' => 500
+                ]
+            ],500);
+        }
+    }
 }
